@@ -37,8 +37,8 @@ var xScale = d3.scaleTime()
 
 function updateXScaleDomain(data) {
 	// var [min,max]=minMax(data);
-    xScale.domain([d3.min(new Date(d.time.substring(11,19)) ),
-    	d3.max(new Date(d.time.substring(11,19)) )]); // da gestire funzione di mapping 
+    xScale.domain([d3.min(function(d){ return new Date(d.time.substring(11,19)) } ),
+    	d3.max(function(d){ return new Date(d.time.substring(11,19))} )]); // da gestire funzione di mapping 
 }
 
 function drawXAxis(){
