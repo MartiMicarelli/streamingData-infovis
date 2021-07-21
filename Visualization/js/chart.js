@@ -3,9 +3,9 @@
 // come gestire scaler su dimensione cerchi?
 // come far arrivare i tweet e con che tempi
 
-var border = 40; // margin
+var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
-var height = 600 - 2 * border; // height of the actual drawing
+var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
 
@@ -37,8 +37,18 @@ var xScale = d3.scaleTime()
 
 function updateXScaleDomain(data) {
 	// var [min,max]=minMax(data);
-    xScale.domain([d3.min(function(d){ return new Date(d.time.substring(11,19)) } ),
-    	d3.max(function(d){ return new Date(d.time.substring(11,19))} )]); // da gestire funzione di mapping 
+	// initially set max and min as first element
+	var max = new Date(data[0].time.substring(11,19));
+  	var min = new Date(data[0].time.substring(11,19));
+
+// iterate over array values and update min & max
+	data.forEach(function(v) {
+  	max = new Date(v.time.substring(11,19)) > new Date(max)? new Date(v.time.substring(11,19)): max;
+  	min = new Date(v.time.substring(11,19)) < new Date(min)? new Date(v.time.substring(11,19)): min;
+});
+    //xScale.domain([d3.min(function(d){ return new Date(d.time.substring(11,19)) } ),
+    	//d3.max(function(d){ return new Date(d.time.substring(11,19))} )]); // da gestire funzione di mapping 
+    xScale.domain([min,max]);
 }
 
 function drawXAxis(){
