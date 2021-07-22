@@ -43,6 +43,7 @@ function updateDrawing(values){
         .style("fill", "rgb(2, 167, 204)")
         .style("opacity", "1")
         .attr("stroke", "none" ) //al momento rimosso stroke
+    dots.exit().remove();
     //dots.transition().duration(updateTime)
     //  .attr("cx", function (d) { return x(d.dato); } ) //funzione che trasforma dato -> fascia dove si trova
     //    .attr("cy", function (d) { return y(d.hashtag); } ) // hashtag
