@@ -7,7 +7,7 @@ def main():
     #chosen_hashtags = hashtags[:10]
     #print(chosen_hashtags)
     chosen_hashtags = ['#vivoazzurro', '#azzurri', '#ita', '#mancini', '#rinascimentoazzurro', '#insigne', '#eng',
-                       '#euro2020final', '#italy', '#olimpiadetokyo2020']
+                       '#euro2020final', '#olimpiadetokyo2020', '#italy']
     with open('tweets.json', 'r') as json_file:
         data = json.load(json_file)
     with open('data.json', 'a', encoding='utf-8') as outfile:
