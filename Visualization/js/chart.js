@@ -65,6 +65,16 @@ function drawYAxis(){
     	.call(d3.axisLeft(yScale) ); 
 }
 
+function nestData(data){
+    //http://learnjsdata.com/group_data.html
+    var values = d3.nest()
+        .key( function(d) { return d.hashtag})
+        .key ( function(d) {return /* funzione che restituisce gruppo*/})
+        .rollup(function(v) { return v.length; }) //controllare sommi su secondo nest
+        .object(data);
+    console.log(JSON.stringify(values));
+}
+
 //dot drawing & updating
 // https://www.d3-graph-gallery.com/graph/bubble_basic.html
 function updateDrawing(values){
@@ -100,7 +110,8 @@ d3.json("data/data.json")
 		drawXAxis();
 		updateYScaleDomain(data);
 		drawYAxis();
-		updateDrawing(data);
+        //var values = nestData(data);
+		updateDrawing(data); //cambiare values
 		
 
             //hover event (selezione)
