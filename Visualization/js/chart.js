@@ -24,6 +24,25 @@ function mapValues(min, max, data) {
 	range = 
 } */
 
+var options = ["Option 1", "Option 2", "Option 3", "Option 4"];
+
+var select = d3.select('body')
+  .append('select')
+    .attr('class','select')
+    .on('change',onchange)
+
+var options = select
+  .selectAll('option')
+    .data(options).enter()
+    .append('option')
+        .text(function (d) { return d; });
+
+function onchange() {
+    selectValue = d3.select('select').property('value')
+    d3.select('body')
+        .append('p')
+        .text(selectValue + ' is the last selected option.')
+};
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + 2*border)      
