@@ -53,15 +53,17 @@ var graph = svg.append('g')
 
 //var xScale = d3.time.scale()
 var xScale = d3.scaleTime()
-	.range([0,width])
+	.range([0,width]);
 	//.padding(padding);
 
-function updateXScaleDomain(data) {
 
+function updateXScaleDomain(data) {
   	var min = new Date(data[0].time);
   	var max = new Date(data[data.length-1].time);
+
   	
     xScale.domain([min,max]);
+
 }
 
 function drawXAxis(){
