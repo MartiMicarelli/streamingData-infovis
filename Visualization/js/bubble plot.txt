@@ -5,7 +5,7 @@
 
  // Add dots
   svg.append('g')
-    .selectAll("dot")
+    .selectAll(".dot")
     .data(data) 
     .enter()
     .append("circle")
