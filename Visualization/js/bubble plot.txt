@@ -6,7 +6,7 @@
  // Add dots
   svg.append('g')
     .selectAll("dot")
-    .data(data)
+    .data(data) 
     .enter()
     .append("circle")
       .attr("cx", function (d) { return x(d.dato); } )
@@ -16,5 +16,5 @@
       .style("opacity", al massimo come animazione, oppure la usiamo per eventuali bubble sovrapposte che meno opacizzate si vede quando sono sovrapposte)
       .attr("stroke", funzione o niente stroke ? )
 
-https://www.d3-graph-gallery.com/graph/bubble_basic.html
+// https://www.d3-graph-gallery.com/graph/bubble_basic.html
  da aggiungere eventualmente una riga su linea o colonna per dare impressione di continuità (credo meglio per riga), eventualmente dotted
