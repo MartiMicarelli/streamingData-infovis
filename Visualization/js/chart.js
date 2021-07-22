@@ -102,6 +102,26 @@ d3.json("data/data.json")
 		drawYAxis();
 		updateDrawing(data);
 		
+
+            //hover event (selezione)
+        graph.on("mouseover", function(d){
+                console.log(d);
+                d3.select(this).attr("opacity",0.6);    
+                })
+        graph.on("mouseout", function(d){
+                console.log(d);
+                d3.select(this).attr("opacity",1);
+                })
+        graph.selectAll(".dot")
+            .on("mouseover", function(d){
+                console.log(d)
+                d3.select(this).attr("stroke","black")
+            })
+        graph.selectAll(".dot")
+            .on("mouseout", function(d){
+                console.log(d)
+                d3.select(this).attr("stroke","none")
+            })
 	})
 	.catch(function(error) {
 		console.log(error); 
