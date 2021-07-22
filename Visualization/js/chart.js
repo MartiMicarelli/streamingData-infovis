@@ -36,22 +36,10 @@ var xScale = d3.scaleTime()
 	//.padding(padding);
 
 function updateXScaleDomain(data) {
-	// var [min,max]=minMax(data);
-	// initially set max and min as first element
-	//var max = new Date(data[0].time.substring(11,19));
-  	//var min = new Date(data[0].time.substring(11,19));
 
-  	var max = new Date(data[0].time);
   	var min = new Date(data[0].time);
-// iterate over array values and update min & max
-	data.forEach(function(v) {
-  	max = new Date(v.time) > max? new Date(v.time): max;
-  	min = new Date(v.time) < min? new Date(v.time): min;
-});
-    //xScale.domain([d3.min(function(d){ return new Date(d.time.substring(11,19)) } ),
-    	//d3.max(function(d){ return new Date(d.time.substring(11,19))} )]); // da gestire funzione di mapping 
-    console.log(min);
-	console.log(max);
+  	var max = new Date(data[data.length-1].time);
+  	
     xScale.domain([min,max]);
 }
 
