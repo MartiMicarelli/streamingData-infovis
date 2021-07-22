@@ -80,22 +80,11 @@ function updateYScaleDomain(data) {
     yScale.domain(data.map((s) => s.hashtag)); 
 }
 
-function make_y_gridlines() {       
-    return d3.axisLeft(yScale)
-        .ticks(10)
-}
 
 function drawYAxis(){
     graph.append("g")
-    	//.attr('transform', `translate(0, ${height})`)
-    	.call(d3.axisLeft(yScale) ); 
-
-    graph.append("g")         
-      .attr("class", "grid")
-      .call(make_y_gridlines()
-          .tickSize(-width)
-          .tickFormat("")
-      );
+    	.attr('transform', `translate(-10,0)`)
+    	.call(d3.axisLeft(yScale).tickSize(-width).tickSizeOuter(5) ); 
 }
 
 function nestData(data){
@@ -149,11 +138,11 @@ d3.json("data/data.json")
 		
 
             //hover event (selezione)
-        graph.on("mouseover", function(d){
+        graph.selectAll(".dot").on("mouseover", function(d){
                 console.log(d);
                 d3.select(this).attr("opacity",0.6);    
                 })
-        graph.on("mouseout", function(d){
+        graph.selectAll(".dot").on("mouseout", function(d){
                 console.log(d);
                 d3.select(this).attr("opacity",1);
                 })
