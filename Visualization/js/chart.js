@@ -56,14 +56,19 @@ var xScale = d3.scaleTime()
 	.range([0,width]);
 	//.padding(padding);
 
+function minData(data){
+    return new Date(data[0].time);
+}
+
+function maxData(data){
+    return new Date(data[data.length-1].time);
+}
 
 function updateXScaleDomain(data) {
-  	var min = new Date(data[0].time);
-  	var max = new Date(data[data.length-1].time);
+  	var min = minData(data);
+  	var max = maxData(data);
 
-  	
     xScale.domain([min,max]);
-
 }
 
 function drawXAxis(){
@@ -89,13 +94,31 @@ function drawYAxis(){
 
 function nestData(data){
     //http://learnjsdata.com/group_data.html
-    var values = d3.nest()
-        .key( function(d) { return d.hashtag})
-        .key ( function(d) {return /* funzione che restituisce gruppo*/})
-        .rollup(function(v) { return v.length; }) //controllare sommi su secondo nest
-        .object(data);
-    console.log(JSON.stringify(values));
-    return values;
+    //var values = d3.group(data, d => d.hashtag)
+        //.key ( function(d) {return bins(d,data)})
+        //.rollup(function(v) { return v.length; }) //controllare sommi su secondo nest
+        //.object(data);
+    //console.log(JSON.stringify(values));
+    //console.log(values);
+    bins(data)
+    return null;
+}
+
+// https://observablehq.com/@d3/d3-bin-time-thresholds
+/* function thresholdTime(n,data) {
+  return (data, min, max) => {
+    return d3.scaleTime().domain([minData(data), maxData(data)]).ticks(n);
+  };
+} */
+
+function bins(data){
+    console.log(data);
+    values = d3.bin()
+        .value(d => new Date(d.time).getTime()/1000)
+        .thresholds(nIntervals)
+        (data)
+  console.log(values);
+  console.log(JSON.stringify(values));
 }
 
 //dot drawing & updating
@@ -133,16 +156,18 @@ d3.json("data/data.json")
 		drawXAxis();
 		updateYScaleDomain(data);
 		drawYAxis();
-        //var values = nestData(data);
+        var values = nestData(data);
 		updateDrawing(data); //cambiare values
 		
 
             //hover event (selezione)
-        graph.selectAll(".dot").on("mouseover", function(d){
+        graph.selectAll(".dot")
+            .on("mouseover", function(d){
                 console.log(d);
                 d3.select(this).attr("opacity",0.6);    
                 })
-        graph.selectAll(".dot").on("mouseout", function(d){
+        graph.selectAll(".dot")
+            .on("mouseout", function(d){
                 console.log(d);
                 d3.select(this).attr("opacity",1);
                 })
