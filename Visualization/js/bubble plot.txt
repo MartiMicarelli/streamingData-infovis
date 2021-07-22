@@ -1,0 +1,20 @@
+// Add a scale for bubble size
+  var z = d3.scaleLinear()
+    .domain([min, max])
+    .range([ min, max]);
+
+ // Add dots
+  svg.append('g')
+    .selectAll("dot")
+    .data(data)
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return x(d.dato); } )
+      .attr("cy", function (d) { return y(d.dato); } )
+      .attr("r", function (d) { return z(d.dato); } ) -> per questo dobbiamo fare una cumulata 
+      .style("fill", possibile funzione che decide il fill)
+      .style("opacity", al massimo come animazione, oppure la usiamo per eventuali bubble sovrapposte che meno opacizzate si vede quando sono sovrapposte)
+      .attr("stroke", funzione o niente stroke ? )
+
+https://www.d3-graph-gallery.com/graph/bubble_basic.html
+ da aggiungere eventualmente una riga su linea o colonna per dare impressione di continuità (credo meglio per riga), eventualmente dotted
