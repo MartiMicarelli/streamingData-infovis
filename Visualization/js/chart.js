@@ -73,6 +73,7 @@ function nestData(data){
         .rollup(function(v) { return v.length; }) //controllare sommi su secondo nest
         .object(data);
     console.log(JSON.stringify(values));
+    return values;
 }
 
 //dot drawing & updating
