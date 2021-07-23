@@ -94,13 +94,13 @@ function drawYAxis(){
 
 function nestData(data){
     //http://learnjsdata.com/group_data.html
-    //var values = d3.group(data, d => d.hashtag)
+    var values = d3.group(data, d => d.hashtag)
         //.key ( function(d) {return bins(d,data)})
         //.rollup(function(v) { return v.length; }) //controllare sommi su secondo nest
         //.object(data);
-    //console.log(JSON.stringify(values));
-    //console.log(values);
-    bins(data)
+    console.log(JSON.stringify(values));
+    console.log(values);
+    bins(data);
     return null;
 }
 
@@ -115,6 +115,7 @@ function bins(data){
     console.log(data);
     values = d3.bin()
         .value(d => new Date(d.time).getTime()/1000)
+        .domain([minData(data).getTime()/1000,maxData(data).getTime()/1000])
         .thresholds(nIntervals)
         (data)
   console.log(values);
@@ -126,8 +127,8 @@ function bins(data){
 function updateDrawing(values){
     //scale bubble dimension
     var rScale = d3.scaleLinear()
-        .domain([0, 200]) //-> max cumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
-        .range([ 0, bubbleMax]);
+        .domain([0, 200]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
+        .range([ 0, bubbleMax]); 
 
 // Add dots
     var dots = graph.selectAll(".dot").data(values); //se non funziona attenzione qui eventualmente
@@ -156,7 +157,7 @@ d3.json("data/data.json")
 		drawXAxis();
 		updateYScaleDomain(data);
 		drawYAxis();
-        var values = nestData(data);
+        //var values = nestData(data);
 		updateDrawing(data); //cambiare values
 		
 
