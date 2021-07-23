@@ -118,8 +118,8 @@ function bins(data){
         .domain([minData(data).getTime()/1000,maxData(data).getTime()/1000])
         .thresholds(nIntervals)
         (data)
-  console.log(values);
-  console.log(JSON.stringify(values));
+  //console.log(values);
+  //console.log(JSON.stringify(values));
 }
 
 //dot drawing & updating
@@ -148,10 +148,33 @@ function updateDrawing(values){
 
 } 
 
+function listen() {
+	//const socket = new WebSocket("ws://localhost:8889");
+	console.log("ciao");
+	const socket = io("http://localhost:8889");
+	console.log("ciao");
+	//socket.on("connect", () => {
+  // either with send()
+  //socket.send("Hello!");
+
+  // or with emit() and custom event names
+  //socket.emit("salutations", "Hello!", { "mr": "john" }, Uint8Array.from([1, 2, 3, 4]));
+//});
+	socket.on("message", data => { console.log(data);});
+	//socket.on("message", data => { console.log(data);});
+
+// handle the event sent with socket.emit()
+//socket.on("greetings", (elem1, elem2, elem3) => {
+  //console.log(elem1, elem2, elem3);
+//});
+
+	}
+
+
 d3.json("data/data.json")
 	.then(function(data) {
 
-
+		listen();
 		// drawing of the x-axis and initial drawing
 		updateXScaleDomain(data);
 		drawXAxis();
