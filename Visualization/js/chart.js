@@ -9,8 +9,9 @@ var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
 var bubbleMax = 500;
-var updateTime = 100; 
+var updateTime = 50; 
 
+var options = ["Option 1", "Option 2", "Option 3", "Option 4"];
 
 /* function minMax(data) {
 	min=d3.min(new Date(function(d){return d.time}.substring(11,19)) );
@@ -23,8 +24,6 @@ var updateTime = 100;
 function mapValues(min, max, data) {
 	range = 
 } */
-
-var options = ["Option 1", "Option 2", "Option 3", "Option 4"];
 
 var select = d3.select('body')
   .append('select')
@@ -73,8 +72,10 @@ function updateXScaleDomain(data) {
 
 function drawXAxis(){
     graph.append("g")
+        .attr("class", "x axis")
     	.attr('transform', `translate(0, ${height})`)
-    	.call(d3.axisBottom(xScale) ); 
+    	.call(d3.axisBottom(xScale) )
+        .exit().remove();
 }
 
 var yScale = d3.scaleBand()
@@ -88,8 +89,10 @@ function updateYScaleDomain(data) {
 
 function drawYAxis(){
     graph.append("g")
+        .attr("class", "y axis")
     	.attr('transform', `translate(-10,0)`)
-    	.call(d3.axisLeft(yScale).tickSize(-width).tickSizeOuter(5) ); 
+    	.call(d3.axisLeft(yScale).tickSize(-width).tickSizeOuter(5) )
+        .exit().remove();
 }
 
 function nestData(data){
@@ -141,57 +144,46 @@ function updateDrawing(values){
         .style("opacity", "1")
         .attr("stroke", "none" ); //al momento rimosso stroke
     dots.exit().remove();
-    //dots.transition().duration(updateTime)
-    //  .attr("cx", function (d) { return x(d.dato); } ) //funzione che trasforma dato -> fascia dove si trova
-    //    .attr("cy", function (d) { return y(d.hashtag); } ) // hashtag
-    //    .attr("r", function (d) { return z(d.dato); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
+    dots.transition().duration(updateTime)
+        .attr("cx", function (d) { return xScale(new Date(d.time)); } ) //funzione che trasforma dato -> fascia dove si trova
+        .attr("cy", function (d) { return yScale(d.hashtag); } ) // hashtag
+        .attr("r", function (d) { return rScale(1); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
 
 } 
 
 function listen() {
-	//const socket = new WebSocket("ws://localhost:8889");
+    port = 8889;
+	//const socket = new WebSocket("ws://127.0.0.1:8889");
 	console.log("ciao");
-	const socket = io("http://localhost:8889");
-	console.log("ciao");
+	const socket = io("localhost:8889");
+	//console.log("ciao");
 	//socket.on("connect", () => {
   // either with send()
   //socket.send("Hello!");
-
+  //socket.listen(port, () => {
+  //console.log(`Socket.IO server running at http://localhost:${port}/`);
+//});
   // or with emit() and custom event names
   //socket.emit("salutations", "Hello!", { "mr": "john" }, Uint8Array.from([1, 2, 3, 4]));
 //});
-	socket.on("message", data => { console.log(data);});
+	//socket.on("message", data => { console.log(data);});
 	//socket.on("message", data => { console.log(data);});
 
+    socket.addEventListener('message', function (event) { console.log('Message from server ', event.data); });
 // handle the event sent with socket.emit()
 //socket.on("greetings", (elem1, elem2, elem3) => {
   //console.log(elem1, elem2, elem3);
 //});
+}
 
-	}
-
-
-d3.json("data/data.json")
-	.then(function(data) {
-
-		listen();
-		// drawing of the x-axis and initial drawing
-		updateXScaleDomain(data);
-		drawXAxis();
-		updateYScaleDomain(data);
-		drawYAxis();
-        //var values = nestData(data);
-		updateDrawing(data); //cambiare values
-		
-
-            //hover event (selezione)
-        graph.selectAll(".dot")
-            .on("mouseover", function(d){
+function eventListerersActive(){
+                //hover event (selezione)
+        
+        graph.on("mouseover", function(d){
                 console.log(d);
                 d3.select(this).attr("opacity",0.6);    
                 })
-        graph.selectAll(".dot")
-            .on("mouseout", function(d){
+        graph.on("mouseout", function(d){
                 console.log(d);
                 d3.select(this).attr("opacity",1);
                 })
@@ -205,6 +197,63 @@ d3.json("data/data.json")
                 console.log(d)
                 d3.select(this).attr("stroke","none")
             })
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function updateAxes(){
+    // ".y.axis" selects elements that have both classes "y" and "axis", that is: class="y axis"
+    svg.select(".y.axis").transition().duration(updateTime).call(d3.axisLeft(yScale).tickSize(-width).tickSizeOuter(5));
+    svg.select(".x.axis").transition().duration(updateTime).call(d3.axisBottom(xScale));
+}
+
+d3.json("data/data.json")
+	.then( async function(data) {
+
+        var values = [data[0]]; 
+		//listen();
+		// drawing of the x-axis and initial drawing
+		updateXScaleDomain(values);
+		drawXAxis();
+		updateYScaleDomain(values);
+		drawYAxis();
+        updateDrawing(values);
+        //var values = nestData(data);
+        eventListerersActive();
+
+        //fake streaming
+
+        var i = 1;
+        var sleeptime = 0;
+        var speedX = 1000;
+        
+
+        while(i < data.length){
+
+            //data to use each iteration (incremental)
+            values.push(data[i]);
+            console.log(values);
+
+            updateXScaleDomain(values);
+            //drawXAxis();
+            updateYScaleDomain(values);
+            //drawYAxis();
+            updateAxes()
+
+            updateDrawing(data); //cambiare values
+
+            sleeptime = new Date(data[i].time).getTime() - new Date(data[i-1].time).getTime();
+            console.log(sleeptime);
+            await sleep(sleeptime/speedX);
+
+            i = i + 1;
+
+        }
+
+		
+		
 	})
 	.catch(function(error) {
 		console.log(error); 

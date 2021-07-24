@@ -17,7 +17,7 @@ def main():
 		data = json.load(json_file)
 	for i in data:
 		# same port or not?
-		forward(i, 8889, targetHost, 8889)
+		forward(i, 8887, targetHost, 8889)
 		time.sleep(1)
 
 if __name__ == "__main__":
