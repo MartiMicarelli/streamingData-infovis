@@ -9,9 +9,10 @@ var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
 var bubbleMax = 500;
-var updateTime = 50; 
+var updateTime = 10; 
 
-var options = ["Option 1", "Option 2", "Option 3", "Option 4"];
+var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
+var optionTimeChosen = "Tutti i risultati"; //default
 
 /* function minMax(data) {
 	min=d3.min(new Date(function(d){return d.time}.substring(11,19)) );
@@ -32,15 +33,14 @@ var select = d3.select('body')
 
 var options = select
   .selectAll('option')
-    .data(options).enter()
+    .data(optionsTime).enter()
     .append('option')
         .text(function (d) { return d; });
 
 function onchange() {
     selectValue = d3.select('select').property('value')
-    d3.select('body')
-        .append('p')
-        .text(selectValue + ' is the last selected option.')
+    optionTimeChosen = selectValue;
+    console.log(optionTimeChosen);
 };
 
 var svg = d3.select("body").append("svg")
@@ -48,6 +48,7 @@ var svg = d3.select("body").append("svg")
     .attr("height", height + 2*border);
 
 var graph = svg.append('g')
+        .attr("class","graph")
 		.attr('transform', `translate(${border}, ${border})`);
 
 //var xScale = d3.time.scale()
@@ -168,7 +169,6 @@ function listen() {
 //});
 	//socket.on("message", data => { console.log(data);});
 	//socket.on("message", data => { console.log(data);});
-
     socket.addEventListener('message', function (event) { console.log('Message from server ', event.data); });
 // handle the event sent with socket.emit()
 //socket.on("greetings", (elem1, elem2, elem3) => {
@@ -176,26 +176,75 @@ function listen() {
 //});
 }
 
-function eventListerersActive(){
+function background(){
+    graph.append("rect")
+        .attr("class","bg")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("fill", "white")
+        .attr("opacity", 0.01)
+        .attr("class","background");
+}
+    
+
+graph.append("line")
+    .attr("class", "mouse-line")
+    .style("stroke", "black")
+    .style("stroke-width", "1px")
+    .attr("pointer-events", "none")
+    .style("opacity", "0")
+    .attr("x1", 200).attr("x2", 200) 
+    .attr("y1", 0).attr("y2", height)
+    .attr("stroke-dasharray", "1,1");
+
+function filterData(data){
+    //var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"]
+    if(optionTimeChosen == "Ultima ora") {  }
+    if(optionTimeChosen == "Ultime 4 ore") {  }
+    if(optionTimeChosen == "Ultime 8 ore") {  }
+    //altrimenti max
+    return data;
+}
+
+
+function eventListenersActive(){
                 //hover event (selezione)
-        
         graph.on("mouseover", function(d){
                 console.log(d);
-                d3.select(this).attr("opacity",0.6);    
+                //d3.select(this).attr("opacity",0.6); 
+                d3.select(".mouse-line")
+                    .style("opacity", "0.2");
+
                 })
         graph.on("mouseout", function(d){
                 console.log(d);
-                d3.select(this).attr("opacity",1);
+                //d3.select(this).attr("opacity",1);
+                d3.select(".mouse-line")
+                    .style("opacity", "0");
                 })
+        graph.on('mousemove', function(d) { // mouse moving over canvas
+                var mouse = d3.pointer(d);
+                var mouse_x = d3.pointer(d)[0];
+                var mouse_y = d3.pointer(d)[1];
+                console.log(mouse)
+                console.log(mouse_x)
+                console.log(mouse_y)
+                d3.select(".mouse-line").attr("x1", mouse_x).attr("x2", mouse_x).style("opacity", 0.2);
+                })
+}
+
+function dotListeners(){
         graph.selectAll(".dot")
             .on("mouseover", function(d){
                 console.log(d)
-                d3.select(this).attr("stroke","black")
+                //d3.select(this).attr("stroke","black")
             })
         graph.selectAll(".dot")
             .on("mouseout", function(d){
                 console.log(d)
-                d3.select(this).attr("stroke","none")
+                //d3.select(this).attr("stroke","none")
             })
 }
 
@@ -221,7 +270,9 @@ d3.json("data/data.json")
 		drawYAxis();
         updateDrawing(values);
         //var values = nestData(data);
-        eventListerersActive();
+        background();
+        eventListenersActive();
+        
 
         //fake streaming
 
@@ -236,6 +287,8 @@ d3.json("data/data.json")
             values.push(data[i]);
             console.log(values);
 
+            dataFilter(values);
+
             updateXScaleDomain(values);
             //drawXAxis();
             updateYScaleDomain(values);
@@ -243,6 +296,7 @@ d3.json("data/data.json")
             updateAxes()
 
             updateDrawing(data); //cambiare values
+            dotListeners();
 
             sleeptime = new Date(data[i].time).getTime() - new Date(data[i-1].time).getTime();
             console.log(sleeptime);
