@@ -9,7 +9,7 @@ var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
 var bubbleMax = 500;
-var updateTime = 0; 
+var updateTime = 200; 
 
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
 var optionTimeChosen = "Tutti i risultati"; //default
