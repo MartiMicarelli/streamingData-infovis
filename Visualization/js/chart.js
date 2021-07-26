@@ -187,7 +187,6 @@ function background(){
         .attr("opacity", 0.01)
         .attr("class","background");
 }
-    
 
 graph.append("line")
     .attr("class", "mouse-line")
@@ -201,9 +200,33 @@ graph.append("line")
 
 function filterData(data){
     //var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"]
-    if(optionTimeChosen == "Ultima ora") {  }
-    if(optionTimeChosen == "Ultime 4 ore") {  }
-    if(optionTimeChosen == "Ultime 8 ore") {  }
+    if(optionTimeChosen == "Ultima ora") { 
+         var max = new Date(maxData(data)).getTime()/1000; //in secondi
+         var interval = 60*60;
+         var threshold = max - interval;
+         for (let i=0; i<data.length; i++){
+            var delta = new Date(data[i].time).getTime()/1000;
+            if(delta > threshold){ return data.slice(i,data.length) }
+         }
+    }
+    if(optionTimeChosen == "Ultime 4 ore") { 
+        var max = new Date(maxData(data)).getTime()/1000; //in secondi
+         var interval = 60*60*4;
+         var threshold = max - interval;
+         for (let i=0; i<data.length; i++){
+            var delta = new Date(data[i].time).getTime()/1000;
+            if(delta > threshold){ return data.slice(i,data.length) }
+         }
+    }
+    if(optionTimeChosen == "Ultime 8 ore") { 
+        var max = new Date(maxData(data)).getTime()/1000; //in secondi
+         var interval = 60*60*8;
+         var threshold = max - interval;
+         for (let i=0; i<data.length; i++){
+            var delta = new Date(data[i].time).getTime()/1000;
+            if(delta > threshold){ return data.slice(i,data.length) }
+         }
+    }
     //altrimenti max
     return data;
 }
@@ -287,7 +310,7 @@ d3.json("data/data.json")
             values.push(data[i]);
             console.log(values);
 
-            dataFilter(values);
+            values = filterData(values);
 
             updateXScaleDomain(values);
             //drawXAxis();
