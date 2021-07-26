@@ -2,14 +2,14 @@
 // durata intervalli: 
 // come gestire scaler su dimensione cerchi?
 // come far arrivare i tweet e con che tempi
-
+var speedX = 1000;
 var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
 var bubbleMax = 500;
-var updateTime = 10; 
+var updateTime = 0; 
 
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
 var optionTimeChosen = "Tutti i risultati"; //default
@@ -75,7 +75,7 @@ function drawXAxis(){
     graph.append("g")
         .attr("class", "x axis")
     	.attr('transform', `translate(0, ${height})`)
-    	.call(d3.axisBottom(xScale) )
+    	.call(d3.axisBottom(xScale))
         .exit().remove();
 }
 
@@ -134,6 +134,15 @@ function updateDrawing(values){
         .domain([0, 200]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
         .range([ 0, bubbleMax]); 
 
+
+graph.append("clipPath")
+    .attr("id", "rect-clip")
+    .append("rect")
+    .attr("x", -10)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height);
+
 // Add dots
     var dots = graph.selectAll(".dot").data(values); //se non funziona attenzione qui eventualmente
     dots.enter().append("circle")
@@ -143,13 +152,15 @@ function updateDrawing(values){
         .attr("r", function (d) { return rScale(1); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
         .style("fill", "rgb(2, 167, 204)")
         .style("opacity", "1")
+        .attr("clip-path", "url(#rect-clip)")
         .attr("stroke", "none" ); //al momento rimosso stroke
-    dots.exit().remove();
-    dots.transition().duration(updateTime)
-        .attr("cx", function (d) { return xScale(new Date(d.time)); } ) //funzione che trasforma dato -> fascia dove si trova
-        .attr("cy", function (d) { return yScale(d.hashtag); } ) // hashtag
-        .attr("r", function (d) { return rScale(1); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
 
+    dots.exit().remove();
+
+    dots.transition().duration(updateTime)
+        .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
+        .attr("cy", function (d) { return yScale(d.hashtag); } ) 
+        .attr("r", function (d) { return rScale(1); } )    
 } 
 
 function listen() {
@@ -248,12 +259,7 @@ function eventListenersActive(){
                     .style("opacity", "0");
                 })
         graph.on('mousemove', function(d) { // mouse moving over canvas
-                var mouse = d3.pointer(d);
                 var mouse_x = d3.pointer(d)[0];
-                var mouse_y = d3.pointer(d)[1];
-                console.log(mouse)
-                console.log(mouse_x)
-                console.log(mouse_y)
                 d3.select(".mouse-line").attr("x1", mouse_x).attr("x2", mouse_x).style("opacity", 0.2);
                 })
 }
@@ -262,12 +268,12 @@ function dotListeners(){
         graph.selectAll(".dot")
             .on("mouseover", function(d){
                 console.log(d)
-                //d3.select(this).attr("stroke","black")
+                d3.select(this).attr("stroke","black")
             })
         graph.selectAll(".dot")
             .on("mouseout", function(d){
                 console.log(d)
-                //d3.select(this).attr("stroke","none")
+                d3.select(this).attr("stroke","none")
             })
 }
 
@@ -276,7 +282,6 @@ function sleep(ms) {
 }
 
 function updateAxes(){
-    // ".y.axis" selects elements that have both classes "y" and "axis", that is: class="y axis"
     svg.select(".y.axis").transition().duration(updateTime).call(d3.axisLeft(yScale).tickSize(-width).tickSizeOuter(5));
     svg.select(".x.axis").transition().duration(updateTime).call(d3.axisBottom(xScale));
 }
@@ -301,13 +306,15 @@ d3.json("data/data.json")
 
         var i = 1;
         var sleeptime = 0;
-        var speedX = 1000;
         
 
         while(i < data.length){
 
-            //data to use each iteration (incremental)
-            values.push(data[i]);
+            values = [];
+            //data to use each iteration
+            for(let j=0; j<i+1; j++){
+                values.push(data[j]);
+            }
             console.log(values);
 
             values = filterData(values);
