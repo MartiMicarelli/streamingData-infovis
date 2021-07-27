@@ -21,10 +21,7 @@ var optionTimeChosen = "Tutti i risultati"; //default
 	console.log(max);
 	return [min,max];
 } 
-
-function mapValues(min, max, data) {
-	range = 
-} */
+*/
 
 var select = d3.select('body')
   .append('select')
@@ -83,8 +80,13 @@ var yScale = d3.scaleBand()
 	.range([0,height])
 	.padding(padding);
 
+var colorScale = d3.scaleOrdinal()
+    .range(["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"])
+
+
 function updateYScaleDomain(data) {
-    yScale.domain(data.map((s) => s.hashtag)); 
+    yScale.domain(data.map((s) => s.hashtag));
+    colorScale.domain(data.map((s) => s.hashtag)); 
 }
 
 
@@ -149,8 +151,9 @@ graph.append("clipPath")
         .attr("class","dot")
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) //funzione che trasforma dato -> fascia dove si trova
         .attr("cy", function (d) { return yScale(d.hashtag); } ) // hashtag
-        .attr("r", function (d) { return rScale(1); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
-        .style("fill", "rgb(2, 167, 204)")
+        .attr("r", function (d) { return rScale(5); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
+        //.style("fill", "rgb(2, 167, 204)")
+        .style("fill", (d) => colorScale(d.hashtag))
         .style("opacity", "1")
         .attr("clip-path", "url(#rect-clip)")
         .attr("stroke", "none" ); //al momento rimosso stroke
@@ -160,15 +163,13 @@ graph.append("clipPath")
     dots.transition().duration(updateTime)
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
         .attr("cy", function (d) { return yScale(d.hashtag); } ) 
-        .attr("r", function (d) { return rScale(1); } )    
+        .attr("r", function (d) { return rScale(1); } );    
 } 
 
 function listen() {
     port = 8889;
 	//const socket = new WebSocket("ws://127.0.0.1:8889");
-	console.log("ciao");
 	const socket = io("localhost:8889");
-	//console.log("ciao");
 	//socket.on("connect", () => {
   // either with send()
   //socket.send("Hello!");
