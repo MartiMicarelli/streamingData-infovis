@@ -14,6 +14,9 @@ var updateTime = 200;
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
 var optionTimeChosen = "Tutti i risultati"; //default
 
+var optionsGroup = ["Singoli tweet", "Raggruppa in gruppi"];
+var optionGroupChosen = "Singoli tweet"; //default
+
 /* function minMax(data) {
 	min=d3.min(new Date(function(d){return d.time}.substring(11,19)) );
 	max=d3.max(new Date(function(d){return d.time}.substring(11,19)) );
@@ -23,22 +26,40 @@ var optionTimeChosen = "Tutti i risultati"; //default
 } 
 */
 
-var select = d3.select('body')
+var select1 = d3.select('body')
   .append('select')
+    .attr('transform', `translate(${border}, 0)`)
     .attr('class','select')
-    .on('change',onchange)
+    .on('change',onchangeTime)
 
-var options = select
+var options = select1
   .selectAll('option')
     .data(optionsTime).enter()
     .append('option')
         .text(function (d) { return d; });
 
-function onchange() {
+var select2 = d3.select('body')
+  .append('select')
+    .attr('transform', `translate(400, 0)`)
+    .attr('class','select')
+    .on('change',onchangeGroup)
+
+var options = select2
+  .selectAll('option')
+    .data(optionsGroup).enter()
+    .append('option')
+        .text(function (d) { return d; });
+
+function onchangeTime() {
     selectValue = d3.select('select').property('value')
     optionTimeChosen = selectValue;
-    console.log(optionTimeChosen);
+    //console.log(optionTimeChosen);
 };
+
+function onchangeGroup() {
+    selectValue = d3.select('select').property('value')
+    optionGroupChosen = selectValue;
+}
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + 2*border)      
@@ -100,14 +121,29 @@ function drawYAxis(){
 
 function nestData(data){
     //http://learnjsdata.com/group_data.html
-    var values = d3.group(data, d => d.hashtag)
+    //https://observablehq.com/@d3/d3-flatgroup
+    //https://github.com/d3/d3-array/blob/main/README.md#flatGroup
+    var values1 = d3.flatGroup(data, d => d.hashtag, d => bin(d,data));
         //.key ( function(d) {return bins(d,data)})
-        //.rollup(function(v) { return v.length; }) //controllare sommi su secondo nest
+    //for ( const array in values)
+    //var values = d3.flatRollup(data, v => v.length, d => d.hashtag, d=> bin(d,data)); //controllare sommi su secondo nest
+    //var values = d3.flatRollup(values1, v => v.length, v=> v.hashtag, v => v.time);
         //.object(data);
+    values = [];
+    for(let i=0; i<values1.length; i++){
+        line = values1[i];
+        array = line[2];
+        //console.log(array);
+        d = {};
+        d["hashtag"] = line[0];
+        d["time"] = line[1];
+        d["values"] = array.length;
+        values.push(d);
+    }
     console.log(JSON.stringify(values));
-    console.log(values);
-    bins(data);
-    return null;
+    //console.log(values);
+    //bins(data);
+    return values;
 }
 
 // https://observablehq.com/@d3/d3-bin-time-thresholds
@@ -116,6 +152,22 @@ function nestData(data){
     return d3.scaleTime().domain([minData(data), maxData(data)]).ticks(n);
   };
 } */
+
+function bin(d,data){
+    min = minData(data).getTime();
+    max = maxData(data).getTime();
+
+    for(let i=0; i<nIntervals; i++){
+        t = new Date(d.time).getTime();
+        ts_min = ((max - min)/(nIntervals))*(i) + min;
+        ts_max = ((max - min)/(nIntervals))*(i+1) + min;
+        if(t <= ts_max) { 
+            //console.log("date" + new Date(t) + "is in slot" + new Date(ts_min) + " - " + new Date(ts_max));
+            return new Date(ts_max);
+        }
+    }
+    return new Date(0);   
+}
 
 function bins(data){
     console.log(data);
@@ -151,7 +203,7 @@ graph.append("clipPath")
         .attr("class","dot")
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) //funzione che trasforma dato -> fascia dove si trova
         .attr("cy", function (d) { return yScale(d.hashtag); } ) // hashtag
-        .attr("r", function (d) { return rScale(5); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
+        .attr("r", function (d) { return rScale(d.values); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
         //.style("fill", "rgb(2, 167, 204)")
         .style("fill", (d) => colorScale(d.hashtag))
         .style("opacity", "1")
@@ -243,7 +295,6 @@ function filterData(data){
     return data;
 }
 
-
 function eventListenersActive(){
                 //hover event (selezione)
         graph.on("mouseover", function(d){
@@ -289,7 +340,7 @@ function updateAxes(){
 
 d3.json("data/data.json")
 	.then( async function(data) {
-
+        nestData(data);
         var values = [data[0]]; 
 		//listen();
 		// drawing of the x-axis and initial drawing
@@ -314,31 +365,37 @@ d3.json("data/data.json")
             values = [];
             //data to use each iteration
             for(let j=0; j<i+1; j++){
-                values.push(data[j]);
+                d = data[j];
+                d["values"] = 1;
+                values.push(d);
             }
-            console.log(values);
+            //console.log(values);
 
             values = filterData(values);
+
+            if(optionGroupChosen == "Raggruppa in gruppi" ){
+                console.log("CHOSEN GROUPING");
+                values = nestData(values);
+            }
+
+            console.log(values);
 
             updateXScaleDomain(values);
             //drawXAxis();
             updateYScaleDomain(values);
             //drawYAxis();
-            updateAxes()
+            updateAxes();
 
             updateDrawing(data); //cambiare values
             dotListeners();
 
             sleeptime = new Date(data[i].time).getTime() - new Date(data[i-1].time).getTime();
-            console.log(sleeptime);
+            //console.log(sleeptime);
             await sleep(sleeptime/speedX);
 
             i = i + 1;
-
         }
-
-		
-		
+	
 	})
 	.catch(function(error) {
 		console.log(error); 
