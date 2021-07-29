@@ -8,7 +8,7 @@ var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
-var bubbleMax = 500;
+var bubbleMax = 1000;
 var updateTime = 200; 
 
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
@@ -29,10 +29,10 @@ var optionGroupChosen = "Singoli tweet"; //default
 var select1 = d3.select('body')
   .append('select')
     .attr('transform', `translate(${border}, 0)`)
-    .attr('class','select')
+    .attr('class','select1')
     .on('change',onchangeTime)
 
-var options = select1
+var options1 = select1
   .selectAll('option')
     .data(optionsTime).enter()
     .append('option')
@@ -41,23 +41,23 @@ var options = select1
 var select2 = d3.select('body')
   .append('select')
     .attr('transform', `translate(400, 0)`)
-    .attr('class','select')
+    .attr('class','select2')
     .on('change',onchangeGroup)
 
-var options = select2
+var options2 = select2
   .selectAll('option')
     .data(optionsGroup).enter()
     .append('option')
         .text(function (d) { return d; });
 
 function onchangeTime() {
-    selectValue = d3.select('select').property('value')
+    selectValue = d3.select('select1').property('value')
     optionTimeChosen = selectValue;
     //console.log(optionTimeChosen);
 };
 
 function onchangeGroup() {
-    selectValue = d3.select('select').property('value')
+    selectValue = d3.select('select2').property('value')
     optionGroupChosen = selectValue;
 }
 
@@ -377,7 +377,7 @@ d3.json("data/data.json")
                 console.log("CHOSEN GROUPING");
                 values = nestData(values);
             }
-
+            values = nestData(values);
             console.log(values);
 
             updateXScaleDomain(values);
