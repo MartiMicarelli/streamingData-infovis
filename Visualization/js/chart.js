@@ -377,7 +377,7 @@ d3.json("data/data.json")
                 console.log("CHOSEN GROUPING");
                 values = nestData(values);
             }
-            values = nestData(values);
+            //values = nestData(values);
             console.log(values);
 
             updateXScaleDomain(values);
