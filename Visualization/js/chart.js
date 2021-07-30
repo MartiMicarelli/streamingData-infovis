@@ -9,7 +9,7 @@ var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 5; // poi andrà modificato
 var bubbleMax = 700;
-var updateTime = 300; 
+var updateTime = 200; 
 
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
 var optionTimeChosen = "Tutti i risultati"; //default
@@ -103,14 +103,13 @@ var yScale = d3.scaleBand()
 	.padding(padding);
 
 var colorScale = d3.scaleOrdinal()
-    .range(["#b30000"]) //, "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"])
+    .range(["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"]);
 
 
 function updateYScaleDomain(data) {
     yScale.domain(data.map((s) => s.hashtag));
     colorScale.domain(data.map((s) => s.hashtag)); 
 }
-
 
 function drawYAxis(){
     graph.append("g")
@@ -121,8 +120,8 @@ function drawYAxis(){
 }
 
 var rScale = d3.scaleLinear()
-        .domain([0, 300]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
-        .range([ 0, bubbleMax]); 
+        .domain([0, 200]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
+        .range([ 0, bubbleMax]);    
 
 function nestData(data){
     //http://learnjsdata.com/group_data.html
@@ -203,7 +202,7 @@ graph.append("clipPath")
         .attr("class","dot")
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) //funzione che trasforma dato -> fascia dove si trova
         .attr("cy", function (d) { return yScale(d.hashtag); } ) // hashtag
-        .attr("r", function (d) { return rScale(d.values); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
+        .attr("r", function (d) { return rScale((d.values)^(0.707)); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
         //.style("fill", "rgb(2, 167, 204)")
         .style("fill", (d) => colorScale(d.hashtag))
         .style("opacity", "1")
@@ -215,7 +214,8 @@ graph.append("clipPath")
     dots.transition().duration(updateTime)
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
         .attr("cy", function (d) { return yScale(d.hashtag); } ) 
-        .attr("r", function (d) { return rScale(1); } );    
+        .attr("r", function (d) { return rScale(1); } )
+        .style("fill", (d) => colorScale(d.hashtag));   
 } 
 
 function listen() {
@@ -383,7 +383,9 @@ d3.json("data/data.json")
             if(optionGroupChosen == "Raggruppa in gruppi" ){
                 values = nestData(values);
             }
-            console.log(values);
+            //console.log(values);
+
+            
 
             updateDrawing(values); //cambiare values
             dotListeners();
