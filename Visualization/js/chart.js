@@ -7,9 +7,9 @@ var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
-var nIntervals = 16; // poi andrà modificato
-var bubbleMax = 1000;
-var updateTime = 200; 
+var nIntervals = 5; // poi andrà modificato
+var bubbleMax = 700;
+var updateTime = 300; 
 
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
 var optionTimeChosen = "Tutti i risultati"; //default
@@ -28,7 +28,7 @@ var optionGroupChosen = "Singoli tweet"; //default
 
 var select1 = d3.select('body')
   .append('select')
-    .attr('transform', `translate(${border}, 0)`)
+    //.attr('transform', `translate(${border}, 0)`)
     .attr('class','select1')
     .on('change',onchangeTime)
 
@@ -40,7 +40,7 @@ var options1 = select1
 
 var select2 = d3.select('body')
   .append('select')
-    .attr('transform', `translate(400, 0)`)
+    //.attr('transform', `translate(400, 0)`)
     .attr('class','select2')
     .on('change',onchangeGroup)
 
@@ -51,14 +51,15 @@ var options2 = select2
         .text(function (d) { return d; });
 
 function onchangeTime() {
-    selectValue = d3.select('select1').property('value')
+    selectValue = d3.select('.select1').property('value')
     optionTimeChosen = selectValue;
-    //console.log(optionTimeChosen);
+    console.log(optionTimeChosen);
 };
 
 function onchangeGroup() {
-    selectValue = d3.select('select2').property('value')
+    selectValue = d3.select('.select2').property('value')
     optionGroupChosen = selectValue;
+    console.log(optionTimeChosen);
 }
 
 var svg = d3.select("body").append("svg")
@@ -140,7 +141,7 @@ function nestData(data){
         d["values"] = array.length;
         values.push(d);
     }
-    console.log(JSON.stringify(values));
+    //console.log(JSON.stringify(values));
     //console.log(values);
     //bins(data);
     return values;
@@ -298,14 +299,14 @@ function filterData(data){
 function eventListenersActive(){
                 //hover event (selezione)
         graph.on("mouseover", function(d){
-                console.log(d);
+                //console.log(d);
                 //d3.select(this).attr("opacity",0.6); 
                 d3.select(".mouse-line")
                     .style("opacity", "0.2");
 
                 })
         graph.on("mouseout", function(d){
-                console.log(d);
+                //console.log(d);
                 //d3.select(this).attr("opacity",1);
                 d3.select(".mouse-line")
                     .style("opacity", "0");
@@ -374,10 +375,8 @@ d3.json("data/data.json")
             values = filterData(values);
 
             if(optionGroupChosen == "Raggruppa in gruppi" ){
-                console.log("CHOSEN GROUPING");
                 values = nestData(values);
             }
-            //values = nestData(values);
             console.log(values);
 
             updateXScaleDomain(values);
