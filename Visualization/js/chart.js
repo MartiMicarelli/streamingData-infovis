@@ -2,7 +2,7 @@
 // durata intervalli: 
 // come gestire scaler su dimensione cerchi?
 // come far arrivare i tweet e con che tempi
-var speedX = 1000;
+var speedX = 100;
 var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
@@ -103,7 +103,7 @@ var yScale = d3.scaleBand()
 	.padding(padding);
 
 var colorScale = d3.scaleOrdinal()
-    .range(["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"])
+    .range(["#b30000"]) //, "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"])
 
 
 function updateYScaleDomain(data) {
@@ -119,6 +119,10 @@ function drawYAxis(){
     	.call(d3.axisLeft(yScale).tickSize(-width).tickSizeOuter(5) )
         .exit().remove();
 }
+
+var rScale = d3.scaleLinear()
+        .domain([0, 300]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
+        .range([ 0, bubbleMax]); 
 
 function nestData(data){
     //http://learnjsdata.com/group_data.html
@@ -142,7 +146,7 @@ function nestData(data){
         values.push(d);
     }
     //console.log(JSON.stringify(values));
-    //console.log(values);
+    console.log(values);
     //bins(data);
     return values;
 }
@@ -184,11 +188,6 @@ function bins(data){
 //dot drawing & updating
 // https://www.d3-graph-gallery.com/graph/bubble_basic.html
 function updateDrawing(values){
-    //scale bubble dimension
-    var rScale = d3.scaleLinear()
-        .domain([0, 200]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
-        .range([ 0, bubbleMax]); 
-
 
 graph.append("clipPath")
     .attr("id", "rect-clip")
@@ -374,18 +373,19 @@ d3.json("data/data.json")
 
             values = filterData(values);
 
-            if(optionGroupChosen == "Raggruppa in gruppi" ){
-                values = nestData(values);
-            }
-            console.log(values);
-
+            //need to update scales BEFORE eventual nesting 
             updateXScaleDomain(values);
             //drawXAxis();
             updateYScaleDomain(values);
             //drawYAxis();
             updateAxes();
 
-            updateDrawing(data); //cambiare values
+            if(optionGroupChosen == "Raggruppa in gruppi" ){
+                values = nestData(values);
+            }
+            console.log(values);
+
+            updateDrawing(values); //cambiare values
             dotListeners();
 
             sleeptime = new Date(data[i].time).getTime() - new Date(data[i-1].time).getTime();
