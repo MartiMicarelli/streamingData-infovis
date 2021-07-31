@@ -1,8 +1,3 @@
-// slot disponibili per l'utente: 1,4,8,12,16 ore
-// durata intervalli: 
-// come gestire scaler su dimensione cerchi?
-// come far arrivare i tweet e con che tempi
-
 //----------------------------------- variabili --------------------------------------
 
 var speedX = 100;
@@ -372,16 +367,16 @@ function eventListenersActive(){
 }
 
 function dotListeners(){
-        graph.selectAll(".dot")
-            .on("mouseover", function(d){
-                console.log(d)
-                d3.select(this).attr("stroke","black")
-            })
-        graph.selectAll(".dot")
-            .on("mouseout", function(d){
-                console.log(d)
-                d3.select(this).attr("stroke","none")
-            })
+    graph.selectAll(".dot")
+        .on("mouseover", function(d){
+            console.log(d)
+            d3.select(this).attr("stroke","black")
+        })
+    graph.selectAll(".dot")
+        .on("mouseout", function(d){
+            console.log(d)
+            d3.select(this).attr("stroke","none")
+        })
 }
 
 //----------------------------------------- finto streaming ---------------------------------
