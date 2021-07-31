@@ -297,7 +297,8 @@ function updateDrawing(values){
     dots.transition().duration(updateTime)
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
         .attr("cy", function (d) { return yScale(d.hashtag); } ) 
-        .attr("r", function (d) { return rScale(1); } )
+        //.attr("r", function (d) { return rScale(1); } )
+        .attr("r", function (d) { return rScale((d.values)^(0.707)); } )
         .style("fill", (d) => colorScale(d.hashtag));   
 }
 
