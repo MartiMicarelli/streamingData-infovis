@@ -424,8 +424,6 @@ d3.json("data/data.json")
             }
             //console.log(values);
 
-            
-
             updateDrawing(values); //cambiare values
             dotListeners();
 
