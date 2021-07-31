@@ -83,6 +83,8 @@ graph.append("line")
     .attr("y1", 0).attr("y2", height)
     .attr("stroke-dasharray", "1,1");
 
+var freezeLine = false; //default
+
 //----------------------------------- scaler --------------------------------------
 
 var xScale = d3.scaleTime()
@@ -293,7 +295,7 @@ function updateDrawing(values){
         .style("fill", (d) => colorScale(d.hashtag))
         .style("opacity", "1")
         .attr("clip-path", "url(#rect-clip)")
-        .attr("stroke", "none" ); //rimosso stroke
+        .attr("stroke", "none"); //rimosso stroke
 
     dots.exit().remove();
 
@@ -308,16 +310,17 @@ function updateDrawing(values){
 function background(){
     graph.append("rect")
         .attr("class","bg")
-        .attr("x", 0)
+        .attr("x", -10)
         .attr("y", 0)
-        .attr("width", width)
+        .attr("width", width + 10)
         .attr("height", height)
-        .attr("fill", "white")
+        .attr("fill", "blue")
         .attr("opacity", 0.01)
+        .attr("stroke", "black") 
         .attr("class","background");
 } 
 
-//----------------------------------- tentativo socket --------------------------------------
+//----------------------------------- tentativo socket (non riuscito) --------------------------------------
 function listen() {
     port = 8889;
 	//const socket = new WebSocket("ws://127.0.0.1:8889");
@@ -343,24 +346,29 @@ function listen() {
 //----------------------------------- event listeners --------------------------------------
 
 function eventListenersActive(){
-                //hover event (selezione)
-        graph.on("mouseover", function(d){
-                //console.log(d);
-                //d3.select(this).attr("opacity",0.6); 
-                d3.select(".mouse-line")
-                    .style("opacity", "0.2");
-
-                })
-        graph.on("mouseout", function(d){
-                //console.log(d);
-                //d3.select(this).attr("opacity",1);
-                d3.select(".mouse-line")
-                    .style("opacity", "0");
-                })
-        graph.on('mousemove', function(d) { // mouse moving over canvas
-                var mouse_x = d3.pointer(d)[0];
-                d3.select(".mouse-line").attr("x1", mouse_x).attr("x2", mouse_x).style("opacity", 0.2);
-                })
+    //hover event (selezione)
+    graph.on("mouseover", function(d){
+        //console.log(d);
+        //d3.select(this).attr("opacity",0.6); 
+        d3.select(".mouse-line")
+            .style("opacity", "0.2");
+        })
+    graph.on("mouseout", function(d){
+        //console.log(d);
+        //d3.select(this).attr("opacity",1);
+        d3.select(".mouse-line")
+            .style("opacity", "0");
+        })
+    graph.on('mousemove', function(d) { // mouse moving over canvas
+        if(!freezeLine){
+            var mouse_x = d3.pointer(d)[0];
+            d3.select(".mouse-line").attr("x1", mouse_x).attr("x2", mouse_x).style("opacity", 0.2);
+            }
+        })
+    //https://stackoverflow.com/questions/29711219/how-to-freeze-and-unfreeze-hover-line-on-click-in-d3
+    graph.on('click', function(d){ // on mouse click toggle frozen status
+        freezeLine = !freezeLine;
+        })
 }
 
 function dotListeners(){
@@ -390,15 +398,13 @@ d3.json("data/data.json")
         updateDrawing(values);
         //var values = nestData(data);
         background();
-        eventListenersActive();
-        
+        eventListenersActive(); 
 
         //fake streaming
 
         var i = 1;
         var sleeptime = 0;
         
-
         while(i < data.length){
 
             values = [];
@@ -412,11 +418,9 @@ d3.json("data/data.json")
 
             values = filterData(values);
 
-            //need to update scales BEFORE eventual nesting 
+            //need to update scales BEFORE eventual nesting, or functions min-max will not work 
             updateXScaleDomain(values);
-            //drawXAxis();
             updateYScaleDomain(values);
-            //drawYAxis();
             updateAxes();
 
             if(optionGroupChosen == "Raggruppa in gruppi" ){
