@@ -5,7 +5,7 @@ var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
-var nIntervals = 10; // poi andrà modificato
+var nIntervals = 16; // poi andrà modificato
 var bubbleMax = 700;
 var updateTime = 200; 
 
@@ -93,7 +93,7 @@ var colorScale = d3.scaleOrdinal()
     .range(["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"]); //default
 
 var rScale = d3.scaleLinear()
-        .domain([0, 200]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
+        .domain([0, 400]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
         .range([ 0, bubbleMax]); 
 
 
@@ -297,7 +297,6 @@ function updateDrawing(values){
     dots.transition().duration(updateTime)
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
         .attr("cy", function (d) { return yScale(d.hashtag); } ) 
-        //.attr("r", function (d) { return rScale(1); } )
         .attr("r", function (d) { return rScale((d.values)^(0.707)); } )
         .style("fill", (d) => colorScale(d.hashtag));   
 }
