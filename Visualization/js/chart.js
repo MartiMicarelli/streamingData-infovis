@@ -6,7 +6,7 @@ var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
 var nIntervals = 16; // poi andrà modificato
-var bubbleMax = 700;
+var bubbleMax = 50;
 var updateTime = 200; 
 
 //----------------------------------- opzioni per le select --------------------------------------
@@ -93,7 +93,6 @@ var colorScale = d3.scaleOrdinal()
     .range(["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"]); //default
 
 var rScale = d3.scaleLinear()
-        .domain([0, 400]) //-> maxcumulata? o un max fisso? altrimenti se si usa un max temporaneo, ci possono essere dot che possono cambiare dimensione (che forse non è sbagliato, all'inizio sarebbero piccolissime)
         .range([ 0, bubbleMax]); 
 
 
@@ -183,6 +182,14 @@ function updateXScaleDomain(data) {
 function updateYScaleDomain(data) {
     yScale.domain(data.map((s) => s.hashtag));
     colorScale.domain(data.map((s) => s.hashtag)); 
+}
+
+function updateRScaleDomainStatic(){
+    rScale.domain([0, 20]); //default
+}
+
+function updateRScaleDomainDynamic(data){
+    rScale.domain([0, d3.max(data, function(d) { return d.values; })*2]); 
 }
 
 //----------------------------------- funzioni per assi x-y --------------------------------------
@@ -417,9 +424,12 @@ d3.json("data/data.json")
             updateXScaleDomain(values);
             updateYScaleDomain(values);
             updateAxes();
+            updateRScaleDomainStatic();
+
 
             if(optionGroupChosen == "Raggruppa in gruppi" ){
                 values = nestData(values);
+                updateRScaleDomainDynamic(values);
             }
             //console.log(values);
 
