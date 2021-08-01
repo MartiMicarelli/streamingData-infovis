@@ -5,8 +5,8 @@ var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
-var nIntervals = 16; // poi andrà modificato
-var bubbleMax = 50;
+var nIntervals = 20; // poi andrà modificato
+var bubbleMax = 15;
 var updateTime = 200; 
 
 //----------------------------------- opzioni per le select --------------------------------------
@@ -185,11 +185,11 @@ function updateYScaleDomain(data) {
 }
 
 function updateRScaleDomainStatic(){
-    rScale.domain([0, 20]); //default
+    rScale.domain([0, 4]); //default
 }
 
 function updateRScaleDomainDynamic(data){
-    rScale.domain([0, d3.max(data, function(d) { return d.values; })*2]); 
+    rScale.domain([0, d3.max(data, function(d) { return d.values; })]); 
 }
 
 //----------------------------------- funzioni per assi x-y --------------------------------------
