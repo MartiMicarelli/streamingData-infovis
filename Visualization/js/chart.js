@@ -100,13 +100,13 @@ var rScale = d3.scaleLinear()
 function onchangeTime() {
     selectValue = d3.select('.select1').property('value')
     optionTimeChosen = selectValue;
-    console.log(optionTimeChosen);
+    //console.log(optionTimeChosen);
 };
 
 function onchangeGroup() {
     selectValue = d3.select('.select2').property('value')
     optionGroupChosen = selectValue;
-    console.log(optionTimeChosen);
+    //console.log(optionTimeChosen);
 }
 
 function updateColor(){
@@ -376,12 +376,12 @@ function eventListenersActive(){
 function dotListeners(){
     graph.selectAll(".dot")
         .on("mouseover", function(d){
-            console.log(d)
+            //console.log(d)
             d3.select(this).attr("stroke","black")
         })
     graph.selectAll(".dot")
         .on("mouseout", function(d){
-            console.log(d)
+            //console.log(d)
             d3.select(this).attr("stroke","none")
         })
 }
