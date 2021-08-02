@@ -299,8 +299,8 @@ function updateDrawing(values){
         .attr("clip-path", "url(#rect-clip)")
         .attr("stroke", "none"); //rimosso stroke
 
-    //dots.append("svg:title").data(values)
-    //        .text(function(d) { return d.values; });
+    dots.append("svg:title").data(values)
+            .text(function(d) { return d.values; });
 
     dots.exit().remove();
 
@@ -308,8 +308,8 @@ function updateDrawing(values){
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
         .attr("cy", function (d) { return yScale(d.hashtag); } ) 
         .attr("r", function (d) { return rScale((d.values)^(0.7)); } )
-        .style("fill", (d) => colorScale(d.hashtag));      
-
+        .style("fill", (d) => colorScale(d.hashtag))     
+        .select("title").text(function(d) { return d.values });
 
 }
 
