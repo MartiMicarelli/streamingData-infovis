@@ -288,24 +288,29 @@ function updateDrawing(values){
         .attr("height", height);
 
     // Add dots
-    var dots = graph.selectAll(".dot").data(values); //se non funziona attenzione qui eventualmente
+    var dots = graph.selectAll(".dot").data(values); 
     dots.enter().append("circle")
         .attr("class","dot")
-        .attr("cx", function (d) { return xScale(new Date(d.time)); } ) //funzione che trasforma dato -> fascia dove si trova
-        .attr("cy", function (d) { return yScale(d.hashtag); } ) // hashtag
-        .attr("r", function (d) { return rScale((d.values)^(0.707)); } ) //cumulata per ogni fascia per ogni hashtag, forse qui funzione che li calcola al posto di function
+        .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
+        .attr("cy", function (d) { return yScale(d.hashtag); } ) 
+        .attr("r", function (d) { return rScale((d.values)^(0.7)); } ) 
         .style("fill", (d) => colorScale(d.hashtag))
         .style("opacity", "1")
         .attr("clip-path", "url(#rect-clip)")
         .attr("stroke", "none"); //rimosso stroke
+
+    //dots.append("svg:title").data(values)
+    //        .text(function(d) { return d.values; });
 
     dots.exit().remove();
 
     dots.transition().duration(updateTime)
         .attr("cx", function (d) { return xScale(new Date(d.time)); } ) 
         .attr("cy", function (d) { return yScale(d.hashtag); } ) 
-        .attr("r", function (d) { return rScale((d.values)^(0.707)); } )
-        .style("fill", (d) => colorScale(d.hashtag));   
+        .attr("r", function (d) { return rScale((d.values)^(0.7)); } )
+        .style("fill", (d) => colorScale(d.hashtag));      
+
+
 }
 
 //background per trigger eventi
