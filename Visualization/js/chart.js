@@ -93,7 +93,7 @@ var colorScale = d3.scaleOrdinal()
     .range(["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78", "#50e991"]); //default
 
 var rScale = d3.scaleLinear()
-        .range([ 0, bubbleMax]); 
+    .range([ 0, bubbleMax]); 
 
 
 //----------------------------------- funzioni di update select --------------------------------------
@@ -394,7 +394,6 @@ function dotListeners(){
 //----------------------------------------- finto streaming ---------------------------------
 d3.json("data/data.json")
 	.then( async function(data) {
-        nestData(data);
         var values = [data[0]]; 
 		//listen();
 		// drawing of the x-axis and initial drawing
@@ -403,7 +402,6 @@ d3.json("data/data.json")
 		updateYScaleDomain(values);
 		drawYAxis();
         updateDrawing(values);
-        //var values = nestData(data);
         background();
         eventListenersActive(); 
 
