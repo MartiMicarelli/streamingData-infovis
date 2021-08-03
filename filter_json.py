@@ -1,15 +1,13 @@
-#import pandas as pd
 import json
 
 def main():
-    #colnames = ['hashtag']
-    #hashtags = pd.read_csv('df.csv', names=colnames, delimiter=' ').hashtag.tolist()
-    #chosen_hashtags = hashtags[:10]
-    #print(chosen_hashtags)
+	# using the 'count' function we discovered the following 10 most popular hashtags
     chosen_hashtags = ['#vivoazzurro', '#azzurri', '#ita', '#mancini', '#rinascimentoazzurro', '#insigne', '#eng',
                        '#euro2020final', '#olimpiadetokyo2020', '#italy']
+    # extraction of the tweets' hashtags from the json file                  
     with open('tweets.json', 'r') as json_file:
         data = json.load(json_file)
+    # creation of a new json file, to filter the tweets' hashtags of interest
     with open('data.json', 'a', encoding='utf-8') as outfile:
         for i in data:
             if i['text'] in chosen_hashtags:

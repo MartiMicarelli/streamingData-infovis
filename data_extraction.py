@@ -3,9 +3,7 @@ import os
 import json
 import string
 
-# To set environment variables in terminal run the following line:
 os.environ['BEARER_TOKEN'] = 'AAAAAAAAAAAAAAAAAAAAACDsRAEAAAAAkR94dXh3%2F8b2LKp6IN5A6asIp44%3DjWLJi2cAAgS63GpWnVgZu4iMBOLj5wimdT8jKdDWw1Uwqt2Umx'
-
 #os.environ['BEARER_TOKEN'] = 'AAAAAAAAAAAAAAAAAAAAAESKRQEAAAAAkGQXa7aXSm2m1qn6m%2BRCiwxbR5s%3DyVtu10NDjIHkIJcmC2EUrgXeLoJfnANzz8AOO3pi21quYBU6kp'
 
 
@@ -78,18 +76,23 @@ def get_stream(headers):
         if response_line:
             json_response = json.loads(response_line)
             print(json.dumps(json_response, indent=4, sort_keys=True))
+            # extraction of the tweet's id
             value = json_response['data']['id']
+            # check if the id is already present in the text file of the tweets' ids
             with open('idsEuro2020.txt', 'a+') as file:
                 file.seek(0)  # set position to start of file
                 lines = file.read().splitlines()
+                # if not already present, process the tweet
                 if value not in lines:
                     file.write(value + "\n")
                     hashtags = []
                     # filter for printable characters then
                     a = ''.join(filter(lambda x: x in string.printable, json_response['data']['text'].lower()))
+                    # extraction of the tweet's hashtags
                     for i in a.split(' '):
                         if i.startswith('#'):
                             hashtags.append(i.strip(','))
+                    # writing of the hashtags in the json file
                     with open('hashtagsEuro2020.json', 'a',  encoding='utf-8') as outfile:
                         for tag in hashtags:
                             if tag != '#euro2020':

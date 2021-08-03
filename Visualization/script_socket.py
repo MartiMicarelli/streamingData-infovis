@@ -10,13 +10,11 @@ def forward(data, port, targetHost, listenPort):
 	sock.sendto(str.encode(json.dumps(data)), (targetHost, listenPort))
 
 def main():
-	bufsize = 1024 # Modify to suit your needs
+	bufsize = 1024 # Modify to suit needs
 	targetHost = "127.0.0.1"
-	#listenPort = 8788
 	with open("data/data.json", "r") as json_file:
 		data = json.load(json_file)
 	for i in data:
-		# same port or not?
 		forward(i, 8887, targetHost, 8889)
 		time.sleep(1)
 
