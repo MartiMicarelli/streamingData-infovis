@@ -1,6 +1,6 @@
 //----------------------------------- variabili --------------------------------------
 
-var speedX = 100;
+var speedX = 50;
 var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
