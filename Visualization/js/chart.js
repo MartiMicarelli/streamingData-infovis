@@ -273,6 +273,13 @@ function bins(data){
   //console.log(JSON.stringify(values));
 }*/
 
+//------------------------------ funzione per estrarre valore da un dizionario ---------------
+
+function get(object, key, default_value) {
+    var result = object[key];
+    return (typeof result !== "undefined") ? result : default_value;
+}
+
 //------------------------------ dot drawing & updating --------------------------------------
 
 // https://www.d3-graph-gallery.com/graph/bubble_basic.html
@@ -426,7 +433,7 @@ d3.json("data/data.json")
             var dictSum = {};
             for(var i=0; i<values.length; i++) {
                 key = values[i].hashtag;
-                dictSum[key] = dictSum.get(key,0)+1;
+                dictSum[key] = get(dictSum,key,0) + 1;
             }
 
 
