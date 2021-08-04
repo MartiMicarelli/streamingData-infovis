@@ -5,7 +5,7 @@ var border = 110; // margin
 var width = 1550 - 2 * border; // width of the actual drawing
 var height = 750 - 2 * border; // height of the actual drawing
 var padding = 1; // padding value
-var nIntervals = 20; 
+var nIntervals = 20; // poi andrà modificato
 var bubbleMax = 15;
 var updateTime = 200; 
 
@@ -180,8 +180,15 @@ function updateXScaleDomain(data) {
 }
 
 function updateYScaleDomain(data) {
-    yScale.domain(data.map((s) => s.hashtag));
-    colorScale.domain(data.map((s) => s.hashtag)); 
+	var dictSum = {};
+    for(var k=0; k<data.length; k++) {
+    	key = data[k].hashtag;
+    	dictSum[key] = get(dictSum,key,0) + 1;
+    }
+
+	var orderedDict = Object.keys(dictSum).sort(function(a, b) {return d3.descending(get(dictSum,a,0),get(dictSum,b,0)) });
+    yScale.domain(orderedDict);
+    colorScale.domain(orderedDict); 
 }
 
 function updateRScaleDomainStatic(){
@@ -429,13 +436,6 @@ d3.json("data/data.json")
             //console.log(values);
 
             values = filterData(values);
-
-            var dictSum = {};
-            for(var i=0; i<values.length; i++) {
-                key = values[i].hashtag;
-                dictSum[key] = get(dictSum,key,0) + 1;
-            }
-
 
             //need to update scales BEFORE eventual nesting, or functions min-max will not work 
             updateXScaleDomain(values);
