@@ -423,6 +423,14 @@ d3.json("data/data.json")
 
             values = filterData(values);
 
+            // sum values for the ordering
+            var dictSum = {};
+            for(var i=0; i<values.length; i++) {
+  				key = values[i].hashtag;
+  				dictSum[key]= dictSum.get(key, 0) + 1;
+			}
+
+
             //need to update scales BEFORE eventual nesting, or functions min-max will not work 
             updateXScaleDomain(values);
             updateYScaleDomain(values);
