@@ -8,6 +8,7 @@ var padding = 1; // padding value
 var nIntervals = 20; // poi andrà modificato
 var bubbleMax = 15;
 var updateTime = 200; 
+var thresholds = [];
 
 //----------------------------------- opzioni per le select --------------------------------------
 var optionsTime = ["Tutti i risultati", "Ultima ora", "Ultime 4 ore", "Ultime 8 ore"];
@@ -245,7 +246,50 @@ function nestData(data){
     return values;
 }
 
+function createTresholds(data) {
+	min = minData(data).getTime();
+    max = maxData(data).getTime();
+    thresholds=[];
+    for(let i=0; i<nIntervals; i++) {
+    	d = {};
+    	d["min"] = new Date(((max - min)/(nIntervals))*(i) + min);
+    	d["max"] = new Date(((max - min)/(nIntervals))*(i+1) + min);
+    	thresholds.push(d);
+    }
+
+
+
+}
+
 function bin(d,data){
+    for(let i=0; i<thresholds.length; i++){
+        t = new Date(d.time).getTime();
+        if(t <= thresholds[i].max) { 
+        	//var pos = thresholds[i].min + (thresholds[i].max-thresholds[i].min)/2;
+            //console.log("date" + new Date(t) + "is in slot" + new Date(ts_min) + " - " + new Date(ts_max));
+            return new Date(thresholds[i].max);
+        }
+    }
+    return new Date(0);   
+}
+
+function createDelimiters() {
+    var lines = graph.selectAll(".line").data(thresholds); 
+    lines.enter().append("line")
+        .attr("class","line")
+        .attr("x1", function (d) { return xScale(d.max); }).attr("x2", function (d) { return xScale(d.max); }) 
+    	.attr("y1", 0).attr("y2", height)
+    	.style("stroke", "black")
+    	.style("opacity", "0.2")
+    	.style("stroke-width", "1px");
+
+    lines.exit().remove();
+
+    lines.transition().duration(updateTime)
+        .attr("x1", function (d) { return xScale(d.max); }).attr("x2", function (d) { return xScale(d.max); });
+}
+
+/* function bin(d,data){
     min = minData(data).getTime();
     max = maxData(data).getTime();
 
@@ -259,7 +303,7 @@ function bin(d,data){
         }
     }
     return new Date(0);   
-}
+} */
 
 // https://observablehq.com/@d3/d3-bin-time-thresholds
 /* function thresholdTime(n,data) {
@@ -425,6 +469,7 @@ d3.json("data/data.json")
         var sleeptime = 0;
         
         while(i < data.length){
+        	thresholds=[];
 
             values = [];
             //data to use each iteration
@@ -445,11 +490,12 @@ d3.json("data/data.json")
 
 
             if(optionGroupChosen == "Raggruppa in gruppi" ){
+            	createTresholds(values);
                 values = nestData(values);
                 updateRScaleDomainDynamic(values);
             }
             //console.log(values);
-
+            createDelimiters();
             updateDrawing(values); //cambiare values
             dotListeners();
 
